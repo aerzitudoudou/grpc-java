@@ -1,6 +1,7 @@
 package com.grpc.greeting.server;
 
 import com.proto.greet.*;
+import io.grpc.Context;
 import io.grpc.stub.StreamObserver;
 
 public class GreetServiceImpl extends GreetServiceGrpc.GreetServiceImplBase {
@@ -111,5 +112,36 @@ public class GreetServiceImpl extends GreetServiceGrpc.GreetServiceImplBase {
         };
 
         return requestObserver;
+    }
+
+    @Override
+    public void greetWithDdl(GreetWithDdlRequest request, StreamObserver<GreetWithDdlResponse> responseObserver) {
+        Context current = Context.current();
+
+        try{
+            for(int i = 0; i < 3; i++){
+                if(!current.isCancelled()){
+                    System.out.println("Sleep for 100 ms");
+                    Thread.sleep(100);
+
+                }else{
+                    return;
+                }
+            }
+
+            System.out.println("send response");
+            String firstName = request.getGreeting().getFirstName();
+            System.out.println("firstName: " + firstName);
+            responseObserver.onNext(
+                    GreetWithDdlResponse.newBuilder()
+                            .setResult("hello " + firstName)
+                            .build()
+            );
+
+            responseObserver.onCompleted();
+        }catch(InterruptedException e){
+            e.printStackTrace();
+        }
+
     }
 }

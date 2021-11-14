@@ -2,8 +2,7 @@ package com.grpc.greeting.client;
 
 import com.proto.dummy.DummyServiceGrpc;
 import com.proto.greet.*;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
+import io.grpc.*;
 import io.grpc.stub.StreamObserver;
 
 import java.util.Arrays;
@@ -22,8 +21,9 @@ public class GreetingClient {
         GreetingClient greetingClient = new GreetingClient();
 //        greetingClient.doUnaryCall(channel);
 //        greetingClient.doServerStreamingCall(channel);
-        greetingClient.doClientStreamingCall(channel);
+//        greetingClient.doClientStreamingCall(channel);
 //        greetingClient.doBiDiStreamingCall(channel);
+        greetingClient.doUnaryCallWithDdl(channel);
 
 
 
@@ -178,6 +178,60 @@ public class GreetingClient {
             e.printStackTrace();
         }
     }
+
+    private void doUnaryCallWithDdl(ManagedChannel channel){
+        GreetServiceGrpc.GreetServiceBlockingStub blockingStub = GreetServiceGrpc.newBlockingStub(channel);
+
+
+        //first call(3000ms ddl)
+
+        try{
+            System.out.println("Sending a request with a ddl of 500 ms");
+            GreetWithDdlResponse response = blockingStub.withDeadline(Deadline.after(3000, TimeUnit.MILLISECONDS))
+                    .greetWithDdl(
+                            GreetWithDdlRequest.newBuilder().setGreeting(
+                                            Greeting.newBuilder()
+                                                    .setFirstName("Mary")
+                                                    .build()
+                                    )
+                                    .build()
+                    );
+            System.out.println(response.getResult());
+        }catch(StatusRuntimeException e){
+            if(e.getStatus().getCode().equals(Status.DEADLINE_EXCEEDED.getCode())){
+                System.out.println("Ddl has been exceeded, we don't want response");
+            }else{
+                e.printStackTrace();
+            }
+        }
+
+
+
+        //first call(100ms ddl)
+
+        try{
+            System.out.println("Sending a request with a ddl of 100 ms");
+            GreetWithDdlResponse response = blockingStub.withDeadline(Deadline.after(100, TimeUnit.MILLISECONDS))
+                    .greetWithDdl(
+                            GreetWithDdlRequest.newBuilder().setGreeting(
+                                            Greeting.newBuilder()
+                                                    .setFirstName("Mary")
+                                                    .build()
+                                    )
+                                    .build()
+                    );
+            System.out.println(response.getResult());
+        }catch(StatusRuntimeException e){
+            if(e.getStatus().getCode().equals(Status.DEADLINE_EXCEEDED.getCode())){
+                System.out.println("Ddl has been exceeded, we don't want response");
+            }else{
+                e.printStackTrace();
+            }
+        }
+
+
+    }
+
 
 
 }

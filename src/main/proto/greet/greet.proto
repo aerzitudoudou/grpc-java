@@ -42,6 +42,14 @@ message LongGreetResponse{
   string result = 1;
 }
 
+message GreetWithDdlRequest{
+  Greeting greeting = 1;
+}
+
+message GreetWithDdlResponse{
+  string result = 1;
+}
+
 service GreetService{
   //unary
   rpc Greet(GreetRequest) returns (GreetResponse){};
@@ -51,4 +59,8 @@ service GreetService{
   rpc LongGreet(stream LongGreetRequest) returns (LongGreetResponse){};
   //Bi-directional streaming api
   rpc GreetEveryone(stream GreetEveryoneRequest) returns (stream GreetEveryoneResponse){};
+
+  //rpc with ddl
+  //this rpc will complete in no less than 300s
+  rpc GreetWithDdl(GreetWithDdlRequest) returns (GreetWithDdlResponse);
 }

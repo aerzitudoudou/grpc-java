@@ -2,6 +2,7 @@ package com.grpc.greeting.server;
 
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import io.grpc.protobuf.services.ProtoReflectionService;
 
 import java.io.IOException;
 
@@ -13,6 +14,7 @@ public class GreetingServer {
                 .addService(new GreetServiceImpl())
                 .addService(new CalculatorServiceImpl())
                 .addService(new DecompositionServerImpl())
+                .addService(ProtoReflectionService.newInstance()) //reflection
                 .build();
 
         server.start();

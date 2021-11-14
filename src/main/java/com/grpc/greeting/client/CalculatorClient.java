@@ -7,6 +7,7 @@ import com.proto.greet.GreetServiceGrpc;
 import com.proto.greet.Greeting;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 
 import java.util.Arrays;
@@ -24,12 +25,26 @@ public class CalculatorClient {
 
 //        calculatorClient.calculate(channel);
 //        calculatorClient.computeAverage(channel);
-        calculatorClient.max(channel);
+//        calculatorClient.max(channel);
+        calculatorClient.doErrorCall(channel);
 
 
 
         System.out.println("shutting down channel");
         channel.shutdown();
+    }
+
+    private void doErrorCall(ManagedChannel channel){
+        CalculatorServiceGrpc.CalculatorServiceBlockingStub blockingStub = CalculatorServiceGrpc.newBlockingStub(channel);
+        try{
+            blockingStub.squareRoot(SquareRootRequest.newBuilder()
+                    .setNumber(-4)
+                    .build());
+        }catch(StatusRuntimeException e){
+            System.out.println("Got an exception for square root!");
+            e.printStackTrace();
+        }
+
     }
 
     private void max(ManagedChannel channel) {

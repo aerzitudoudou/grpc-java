@@ -34,6 +34,14 @@ message MaxResponse{
   int32 result = 1;
 }
 
+message SquareRootRequest{
+  int32 number = 1;
+}
+
+message SquareRootResponse{
+  double number_root = 1;
+}
+
 service CalculatorService{
   //unary
   rpc calculate(CalculatorRequest) returns (CalculatorResponse){};
@@ -43,4 +51,8 @@ service CalculatorService{
 
   //bi-direction streaming api to find the current maximum number
   rpc max(stream MaxRequest) returns(stream MaxResponse){};
- }
+
+  //error handling
+  //the error being sent is INVALID_ARGUMENT
+  rpc SquareRoot(SquareRootRequest) returns(SquareRootResponse){};
+}
