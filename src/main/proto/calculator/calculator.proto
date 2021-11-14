@@ -18,7 +18,29 @@ message CalculatorResponse{
   int32 result = 1;
 }
 
+message AverageRequest{
+  int32 number = 1;
+}
+
+message AverageResponse{
+  double result = 1;
+}
+
+message MaxRequest{
+  int32 number = 1;
+}
+
+message MaxResponse{
+  int32 result = 1;
+}
+
 service CalculatorService{
   //unary
   rpc calculate(CalculatorRequest) returns (CalculatorResponse){};
-}
+
+  //client streaming api to find average of
+  rpc average(stream AverageRequest) returns(AverageResponse){};
+
+  //bi-direction streaming api to find the current maximum number
+  rpc max(stream MaxRequest) returns(stream MaxResponse){};
+ }

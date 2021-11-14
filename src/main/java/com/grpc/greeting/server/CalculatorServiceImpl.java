@@ -1,9 +1,6 @@
 package com.grpc.greeting.server;
 
-import com.proto.calculator.CalculatorRequest;
-import com.proto.calculator.CalculatorResponse;
-import com.proto.calculator.CalculatorServiceGrpc;
-import com.proto.calculator.Integers;
+import com.proto.calculator.*;
 import io.grpc.stub.StreamObserver;
 
 public class CalculatorServiceImpl extends CalculatorServiceGrpc.CalculatorServiceImplBase {
@@ -25,5 +22,69 @@ public class CalculatorServiceImpl extends CalculatorServiceGrpc.CalculatorServi
 
         responseObserver.onCompleted();
 
+    }
+
+
+    @Override
+    public StreamObserver<AverageRequest> average(StreamObserver<AverageResponse> responseObserver) {
+        StreamObserver<AverageRequest> requestObserver = new StreamObserver<AverageRequest>() {
+            double sum = 0;
+            int counter = 0;
+            @Override
+            public void onNext(AverageRequest value) {
+                counter++;
+                sum+=value.getNumber();
+            }
+
+            @Override
+            public void onError(Throwable t) {
+
+            }
+
+            @Override
+            public void onCompleted() {
+                responseObserver.onNext(
+                        AverageResponse.newBuilder()
+                                .setResult(sum/counter)
+                                .build()
+                );
+
+                responseObserver.onCompleted();
+            }
+        };
+
+        return requestObserver;
+    }
+
+    @Override
+    public StreamObserver<MaxRequest> max(StreamObserver<MaxResponse> responseObserver) {
+        StreamObserver<MaxRequest> requestObserver = new StreamObserver<MaxRequest>() {
+            int curMax = Integer.MIN_VALUE;
+            @Override
+            public void onNext(MaxRequest value) {
+                System.out.println("curMax is: " + curMax);
+                int cur = value.getNumber();
+                if(cur > curMax){
+                    MaxResponse maxResponse = MaxResponse.newBuilder()
+                            .setResult(cur)
+                            .build();
+                    responseObserver.onNext(maxResponse);
+                    curMax = cur;
+
+                }
+            }
+
+            @Override
+            public void onError(Throwable t) {
+
+            }
+
+            @Override
+            public void onCompleted() {
+                responseObserver.onCompleted();
+            }
+        };
+
+        return requestObserver;
     }
 }
